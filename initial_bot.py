@@ -22,10 +22,14 @@ async def status(ctx):
 
 @bot.command()
 async def video_test(ctx):
+    await ctx.send(".\n\n\n\n\n\n.")
+
     week_ago = dt.datetime.now() - dt.timedelta(days=7)
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
 
     for n in range(30):
+
+        # INTRO ##########################################################################################
         if clips["data"][n]["duration"] > 50:
             message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
                        clips["data"][n]["broadcaster_name"] + "**\n" +
@@ -35,7 +39,7 @@ async def video_test(ctx):
                        clips["data"][n]["broadcaster_name"] + "**\n" +
                        clips["data"][n]["thumbnail_url"].split("-preview")[0] + ".mp4")
 
-        # RATING ##########################################################################################
+        # RATING #########################################################################################
         rate_message = await ctx.send(message, components=[
             [Button(label="1"), Button(label="2"), Button(label="3"),
              Button(label="4"), Button(label="5")],
@@ -51,7 +55,6 @@ async def video_test(ctx):
         await rate_message.edit(components=[])
         await ctx.send(f"*Rated: **{interaction_rate.component.label}***. By {interaction_rate.author}")
         if interaction_rate.component.label == "delete":
-            await ctx.send(".\n\n\n\n\n\n.")
             continue
 
         # USE AS CLIP ####################################################################################
@@ -106,6 +109,9 @@ async def video_test(ctx):
         await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***." +
                                  f" By {interaction_video.author}", components=[])
 
-        await ctx.send(".\n\n\n\n\n\n.")
+        # TODO Add info to pandas database
+
+# TO DO Function to fix outdated clip info
+# TODO Function to show clip of given rating (optional: broadcaster)
 
 bot.run(config.DISCORD_TOKEN)
