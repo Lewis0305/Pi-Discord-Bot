@@ -30,29 +30,6 @@ async def status(ctx):
 
 
 @bot.command()
-async def button(ctx):
-    await ctx.send("hello", components=[
-        [Button(label="1", style=2, custom_id="1"),
-         Button(label="2", style=2, custom_id="2"),
-         Button(label="3", style=2, custom_id="3"),
-         Button(label="4", style=2, custom_id="4"),
-         Button(label="5", style=2, custom_id="5")],
-        [Button(label="6", style=2, custom_id="6"),
-         Button(label="7", style=2, custom_id="7"),
-         Button(label="8", style=2, custom_id="8"),
-         Button(label="9", style=2, custom_id="9"),
-         Button(label="10", style=2, custom_id="10")],
-        [Button(label="Delete", style=4, custom_id="button_delete")]
-    ])
-    interaction = await bot.wait_for("button_click")
-    try:
-        await interaction.respond()
-    except:
-        pass
-    await ctx.send("Success: " + interaction.component.label)
-
-
-@bot.command()
 async def video_test(ctx):
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=DT.datetime(2021, 12, 6))
 
@@ -138,13 +115,5 @@ async def video_test(ctx):
     # print(clips["data"][clip_number])
     # await ctx.send("title\n" + clips["data"][clip_number]["thumbnail_url"].split("-preview")[0] + ".mp4")
     # await ctx.send(clips["data"][clip_number]["url"])
-
-
-@bot.command()
-async def greet(ctx):
-    await ctx.send("Say hello!")
-
-    msg = await bot.wait_for("message")
-    await ctx.send(f"Hello {msg.author}! ({msg.content})")
 
 bot.run(config.DISCORD_TOKEN)
