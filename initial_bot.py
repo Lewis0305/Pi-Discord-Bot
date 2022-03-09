@@ -7,6 +7,7 @@ import pandas as pd
 
 from twitchAPI.twitch import Twitch
 
+import datetime as dt
 import config
 import os
 
@@ -18,10 +19,6 @@ my_app_secret = config.TWITCH_CLIENT_SECRET
 
 twitch = Twitch(client_id, my_app_secret)
 
-import datetime as DT
-today = DT.date.today()
-week_ago = today - DT.timedelta(days=7)
-
 
 @bot.command()
 async def status(ctx):
@@ -30,7 +27,8 @@ async def status(ctx):
 
 @bot.command()
 async def video_test(ctx):
-    clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=DT.datetime(2021, 12, 6))
+    week_ago = dt.datetime.now() - dt.timedelta(days=7)
+    clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
 
     for n in range(30):
         if clips["data"][n]["duration"] > 50:
