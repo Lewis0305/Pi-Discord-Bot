@@ -18,7 +18,6 @@ my_app_secret = config.TWITCH_CLIENT_SECRET
 
 twitch = Twitch(client_id, my_app_secret)
 
-
 import datetime as DT
 today = DT.date.today()
 week_ago = today - DT.timedelta(days=7)
@@ -44,7 +43,6 @@ async def video_test(ctx):
                        clips["data"][n]["thumbnail_url"].split("-preview")[0] + ".mp4")
 
         # RATING ##########################################################################################
-        # TODO Delete old Buttons
         rate_message = await ctx.send(message, components=[
             [Button(label="1"), Button(label="2"), Button(label="3"),
              Button(label="4"), Button(label="5")],
@@ -64,8 +62,7 @@ async def video_test(ctx):
             continue
 
         # USE AS CLIP ####################################################################################
-        # TODO Delete old Buttons
-        clip_message = await ctx.send("Use as a **clip**?", components=[
+        clip_message = await ctx.send("Use as a **Clip**?", components=[
             [Button(label="Yes", style=3), Button(label="No", style=4)]
         ])
         interaction_clip = await bot.wait_for("button_click")
@@ -73,17 +70,16 @@ async def video_test(ctx):
             await interaction_clip.respond()
         except:
             pass
+        await clip_message.edit(components=[])
 
         # Clip Title #####################################################################################
         if interaction_clip.component.label == "Yes":
-            await clip_message.edit(f"*Use as Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}",
-                                    components=[])
+            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}")
 
             await ctx.send("Enter Clip Name:")
             while True:
                 msg = await bot.wait_for("message")
 
-                # TODO Delete old Buttons
                 title_message = await ctx.send(f"Confirm? ({msg.content})", components=[
                     [Button(label="Yes", style=3), Button(label="No", style=4)]
                 ])
@@ -95,11 +91,25 @@ async def video_test(ctx):
                     pass
 
                 if interaction_title.component.label == "Yes":
-                    await title_message.edit(f"Confirmed: ({msg.content})", components=[])
+                    await title_message.edit(f"*Clip Title: **{msg.content}***", components=[])
                     break
                 await title_message.delete()
+        else:
+            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}")
+
+        # Main Video #####################################################################################
+        video_message = await ctx.send("Use in a **Video**?", components=[
+            [Button(label="Yes", style=3), Button(label="No", style=4)]
+        ])
+        interaction_video = await bot.wait_for("button_click")
+        try:
+            await interaction_video.respond()
+        except:
+            pass
+
+        await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***. By {interaction_video.author}",
+                                 components=[])
 
         await ctx.send(".\n\n\n\n\n\n.")
-
 
 bot.run(config.DISCORD_TOKEN)
