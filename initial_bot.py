@@ -1,12 +1,8 @@
 import discord
-# from discord.ui import Button # Only in Discord.py 2.0 (requires python <3.7)
 from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, SelectOption, Select
-
-import pandas as pd
-
 from twitchAPI.twitch import Twitch
-
+import pandas as pd
 import datetime as dt
 import config
 import os
@@ -16,7 +12,6 @@ DiscordComponents(bot)
 
 client_id = config.TWITCH_CLIENT_ID
 my_app_secret = config.TWITCH_CLIENT_SECRET
-
 twitch = Twitch(client_id, my_app_secret)
 
 
@@ -32,12 +27,12 @@ async def video_test(ctx):
 
     for n in range(30):
         if clips["data"][n]["duration"] > 50:
-            message = ("Title: **" + clips["data"][n]["title"] + "**\n" +
-                       "Broadcaster: **" + clips["data"][n]["broadcaster_name"] + "**\n" +
+            message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
+                       clips["data"][n]["broadcaster_name"] + "**\n" +
                        clips["data"][n]["url"])
         else:
-            message = ("Title: **" + clips["data"][n]["title"] + "**\n" +
-                       "Broadcaster: **" + clips["data"][n]["broadcaster_name"] + "**\n" +
+            message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
+                       clips["data"][n]["broadcaster_name"] + "**\n" +
                        clips["data"][n]["thumbnail_url"].split("-preview")[0] + ".mp4")
 
         # RATING ##########################################################################################
@@ -51,7 +46,7 @@ async def video_test(ctx):
         interaction_rate = await bot.wait_for("button_click")
         try:
             await interaction_rate.respond()
-        except:
+        except(Exception,):
             pass
         await rate_message.edit(components=[])
         await ctx.send(f"*Rated: **{interaction_rate.component.label}***. By {interaction_rate.author}")
@@ -66,13 +61,14 @@ async def video_test(ctx):
         interaction_clip = await bot.wait_for("button_click")
         try:
             await interaction_clip.respond()
-        except:
+        except(Exception,):
             pass
         await clip_message.edit(components=[])
 
         # Clip Title #####################################################################################
         if interaction_clip.component.label == "Yes":
-            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}")
+            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***." +
+                                    f" By {interaction_clip.author}")
 
             await ctx.send("Enter Clip Name:")
             while True:
@@ -85,7 +81,7 @@ async def video_test(ctx):
                 interaction_title = await bot.wait_for("button_click")
                 try:
                     await interaction_title.respond()
-                except:
+                except(Exception,):
                     pass
 
                 if interaction_title.component.label == "Yes":
@@ -93,20 +89,22 @@ async def video_test(ctx):
                     break
                 await title_message.delete()
         else:
-            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}")
+            await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***." +
+                                    f" By {interaction_clip.author}")
 
         # Main Video #####################################################################################
         video_message = await ctx.send("Use in a **Video**?", components=[
             [Button(label="Yes", style=3), Button(label="No", style=4)]
         ])
         interaction_video = await bot.wait_for("button_click")
+
         try:
             await interaction_video.respond()
-        except:
+        except(Exception,):
             pass
 
-        await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***. By {interaction_video.author}",
-                                 components=[])
+        await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***." +
+                                 f" By {interaction_video.author}", components=[])
 
         await ctx.send(".\n\n\n\n\n\n.")
 
