@@ -29,6 +29,8 @@ async def video_test(ctx):
 
     for n in range(30):
 
+        # TODO Edit database info at the start of editing to avoid duplicates
+
         # INTRO ##########################################################################################
         if clips["data"][n]["duration"] > 50:
             message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
@@ -111,7 +113,24 @@ async def video_test(ctx):
 
         # TODO Add info to pandas database
 
+
+@bot.command()
+async def scrape_videos(ctx):
+    # TODO Add mass amounts of videos to database (without duplicates)
+    pass
+
+
+@bot.command()
+async def add_video(ctx):
+    # TODO Add an example video to a pandas database
+    pass
+
 # TO DO Function to fix outdated clip info
-# TODO Function to show clip of given rating (optional: broadcaster)
+
+
+@bot.command()
+async def video_rated(ctx, *args):
+    # TODO Function to show clip of given rating (optional: broadcaster)
+    print(args)
 
 bot.run(config.DISCORD_TOKEN)
