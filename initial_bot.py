@@ -46,17 +46,11 @@ async def video_test(ctx):
         # RATING ##########################################################################################
         # TODO Delete old Buttons
         rate_message = await ctx.send(message, components=[
-            [Button(label="1", style=2, custom_id="1"),
-             Button(label="2", style=2, custom_id="2"),
-             Button(label="3", style=2, custom_id="3"),
-             Button(label="4", style=2, custom_id="4"),
-             Button(label="5", style=2, custom_id="5")],
-            [Button(label="6", style=2, custom_id="6"),
-             Button(label="7", style=2, custom_id="7"),
-             Button(label="8", style=2, custom_id="8"),
-             Button(label="9", style=2, custom_id="9"),
-             Button(label="10", style=2, custom_id="10")],
-            [Button(label="Delete", style=4, custom_id="button_delete")]
+            [Button(label="1"), Button(label="2"), Button(label="3"),
+             Button(label="4"), Button(label="5")],
+            [Button(label="6"), Button(label="7"), Button(label="8"),
+             Button(label="9"), Button(label="10")],
+            [Button(label="delete", style=4)]
         ])
         interaction_rate = await bot.wait_for("button_click")
         try:
@@ -65,21 +59,20 @@ async def video_test(ctx):
             pass
         await rate_message.edit(components=[])
         await ctx.send(f"*Rated: **{interaction_rate.component.label}***. By {interaction_rate.author}")
-        print(interaction_rate.component.label)
+        if interaction_rate.component.label == "delete":
+            await ctx.send(".\n\n\n\n\n\n.")
+            continue
 
         # USE AS CLIP ####################################################################################
         # TODO Delete old Buttons
         clip_message = await ctx.send("Use as a **clip**?", components=[
-            [Button(label="Yes", style=3, custom_id="yes"),
-             Button(label="No", style=4, custom_id="no")]
+            [Button(label="Yes", style=3), Button(label="No", style=4)]
         ])
         interaction_clip = await bot.wait_for("button_click")
         try:
             await interaction_clip.respond()
         except:
             pass
-        # await ctx.send("***" + interaction_clip.component.label + f"***. By {interaction_clip.author}")
-        print(interaction_clip.component.label)
 
         # Clip Title #####################################################################################
         if interaction_clip.component.label == "Yes":
@@ -92,8 +85,7 @@ async def video_test(ctx):
 
                 # TODO Delete old Buttons
                 title_message = await ctx.send(f"Confirm? ({msg.content})", components=[
-                    [Button(label="Yes", style=3, custom_id="yes"),
-                     Button(label="No", style=4, custom_id="no")]
+                    [Button(label="Yes", style=3), Button(label="No", style=4)]
                 ])
 
                 interaction_title = await bot.wait_for("button_click")
@@ -104,17 +96,10 @@ async def video_test(ctx):
 
                 if interaction_title.component.label == "Yes":
                     await title_message.edit(f"Confirmed: ({msg.content})", components=[])
-                    print(msg.content)
-                    print(interaction_title.component.label)
                     break
                 await title_message.delete()
 
         await ctx.send(".\n\n\n\n\n\n.")
 
-
-    # clip_number = 4
-    # print(clips["data"][clip_number])
-    # await ctx.send("title\n" + clips["data"][clip_number]["thumbnail_url"].split("-preview")[0] + ".mp4")
-    # await ctx.send(clips["data"][clip_number]["url"])
 
 bot.run(config.DISCORD_TOKEN)
