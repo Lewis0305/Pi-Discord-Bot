@@ -64,7 +64,7 @@ async def video_test(ctx):
         except:
             pass
         await rate_message.edit(components=[])
-        await ctx.send("*Rated: **" + interaction_rate.component.label + f"***. By {interaction_rate.author}")
+        await ctx.send(f"*Rated: **{interaction_rate.component.label}***. By {interaction_rate.author}")
         print(interaction_rate.component.label)
 
         # USE AS CLIP ####################################################################################
@@ -83,14 +83,15 @@ async def video_test(ctx):
 
         # Clip Title #####################################################################################
         if interaction_clip.component.label == "Yes":
-            await clip_message.edit("*Use as Clip: **" + interaction_clip.component.label + f"***. By {interaction_clip.author}",
+            await clip_message.edit(f"*Use as Clip: **{interaction_clip.component.label}***. By {interaction_clip.author}",
                                     components=[])
+
+            await ctx.send("Enter Clip Name:")
             while True:
-                await ctx.send("Enter Clip Name:")
                 msg = await bot.wait_for("message")
 
                 # TODO Delete old Buttons
-                await ctx.send(f"Confirm? ({msg.content})", components=[
+                title_message = await ctx.send(f"Confirm? ({msg.content})", components=[
                     [Button(label="Yes", style=3, custom_id="yes"),
                      Button(label="No", style=4, custom_id="no")]
                 ])
@@ -102,13 +103,13 @@ async def video_test(ctx):
                     pass
 
                 if interaction_title.component.label == "Yes":
-                    await ctx.send("***" + msg.content + "***")
+                    await title_message.edit(f"Confirmed: ({msg.content})", components=[])
                     print(msg.content)
                     print(interaction_title.component.label)
                     break
+                await title_message.delete()
 
-
-        await ctx.send("Done\n\n\n\n\n\nNext")
+        await ctx.send(".\n\n\n\n\n\n.")
 
 
     # clip_number = 4
