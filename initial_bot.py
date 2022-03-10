@@ -22,23 +22,26 @@ async def status(ctx):
 
 @bot.command()
 async def video_test(ctx):
-    await ctx.send(".\n\n\n\n\n\n.")
+
 
     week_ago = dt.datetime.now() - dt.timedelta(days=7)
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
 
     for n in range(30):
+        await ctx.send(".\n\n\n\n\n\n.")
 
         # TODO Edit database info at the start of editing to avoid duplicates
 
         # INTRO ##########################################################################################
         if clips["data"][n]["duration"] > 50:
-            message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
-                       clips["data"][n]["broadcaster_name"] + "**\n" +
+            message = ("Title: **" + clips["data"][n]["title"] + "**" +
+                       "\nBroadcaster: **" + clips["data"][n]["broadcaster_name"] + "**" +
+                       "\t\tGame: **" + twitch.get_games([clips["data"][n]["game_id"]])["data"][0]["name"] + "**\n" +
                        clips["data"][n]["url"])
         else:
-            message = ("Title: **" + clips["data"][n]["title"] + "**\nBroadcaster: **" +
-                       clips["data"][n]["broadcaster_name"] + "**\n" +
+            message = ("Title: **" + clips["data"][n]["title"] + "**" +
+                       "\nBroadcaster: **" + clips["data"][n]["broadcaster_name"] + "**" +
+                       "\t\tGame: **" + twitch.get_games([clips["data"][n]["game_id"]])["data"][0]["name"] + "**\n" +
                        clips["data"][n]["thumbnail_url"].split("-preview")[0] + ".mp4")
 
         # RATING #########################################################################################
