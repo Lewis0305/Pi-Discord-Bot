@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, SelectOption, Select
 from twitchAPI.twitch import Twitch
 import pandas as pd
+from dataclasses import dataclass  # simple structs
 import datetime as dt
 import config
 import os
@@ -13,6 +14,39 @@ DiscordComponents(bot)
 client_id = config.TWITCH_CLIENT_ID
 my_app_secret = config.TWITCH_CLIENT_SECRET
 twitch = Twitch(client_id, my_app_secret)
+
+
+@dataclass
+class RateInfo:
+    rating: int
+    clip_use: str = "no"
+    video_use: str = "no"
+    clip_title: str = ""
+
+
+def add_video(clip_info, rate_info, database='video_database.csv'):
+    video_database = pd.read_csv(database, index_col=0)
+
+    video_database.loc[clip_info["video_id"]] = {
+        'id': clip_info["id"],
+        'video_title': clip_info["title"],
+        'rating': rate_info.rating,  # example
+        'clip_use': rate_info.clip_use,  # example
+        'clip_title': rate_info.clip_title,  # example
+        'video_use': rate_info.video_use,  # example
+        'broadcaster_name': clip_info["broadcaster_name"],
+        'broadcaster_id': clip_info["broadcaster_id"],
+        'game_name': twitch.get_games([clip_info["game_id"]])["data"][0]["name"],
+        'game_id': clip_info["game_id"],
+        'video_url': clip_info["url"],
+        'video_mp4': clip_info["thumbnail_url"].split("-preview")[0] + ".mp4",
+        'thumbnail_jpg': clip_info["thumbnail_url"],
+        'view_count': clip_info["view_count"],
+        'time_created': clip_info["created_at"],  # might want to alter this (maybe turn into datetime)
+        'duration': clip_info["duration"]
+    }
+
+    video_database.to_csv(database)
 
 
 @bot.command()
@@ -63,10 +97,11 @@ async def video_test(ctx):
         await ctx.send(f"*Rated: **{interaction_rate.component.label}***. By {interaction_rate.author}")
         if interaction_rate.component.label == "delete":
             continue
+        clip_rating = RateInfo(interaction_rate.component.label)
 
         # USE AS CLIP ####################################################################################
         clip_message = await ctx.send("Use as a **Clip**?", components=[
-            [Button(label="Yes", style=3), Button(label="No", style=4)]
+            [Button(label="yes", style=3), Button(label="no", style=4)]
         ])
         interaction_clip = await bot.wait_for("button_click")
         try:
@@ -76,7 +111,8 @@ async def video_test(ctx):
         await clip_message.edit(components=[])
 
         # Clip Title #####################################################################################
-        if interaction_clip.component.label == "Yes":
+        if interaction_clip.component.label == "yes":
+            clip_rating.clip_use = "yes"
             await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***." +
                                     f" By {interaction_clip.author}")
 
@@ -85,7 +121,7 @@ async def video_test(ctx):
                 msg = await bot.wait_for("message")
 
                 title_message = await ctx.send(f"Confirm? ({msg.content})", components=[
-                    [Button(label="Yes", style=3), Button(label="No", style=4)]
+                    [Button(label="yes", style=3), Button(label="no", style=4)]
                 ])
 
                 interaction_title = await bot.wait_for("button_click")
@@ -94,8 +130,9 @@ async def video_test(ctx):
                 except(Exception,):
                     pass
 
-                if interaction_title.component.label == "Yes":
+                if interaction_title.component.label == "yes":
                     await title_message.edit(f"*Clip Title: **{msg.content}***", components=[])
+                    clip_rating.clip_title = msg.content
                     break
                 await title_message.delete()
         else:
@@ -104,7 +141,7 @@ async def video_test(ctx):
 
         # Main Video #####################################################################################
         video_message = await ctx.send("Use in a **Video**?", components=[
-            [Button(label="Yes", style=3), Button(label="No", style=4)]
+            [Button(label="yes", style=3), Button(label="no", style=4)]
         ])
         interaction_video = await bot.wait_for("button_click")
 
@@ -113,69 +150,17 @@ async def video_test(ctx):
         except(Exception,):
             pass
 
+        clip_rating.video_use = interaction_video.component.label
         await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***." +
                                  f" By {interaction_video.author}", components=[])
 
-        # TODO Add info to pandas database
+        add_video(clips["data"][n], clip_rating)
 
 
 @bot.command()
 async def scrape_videos(ctx):
     # TODO Add mass amounts of videos to database (without duplicates)
     pass
-
-
-@bot.command()
-async def add_video(ctx):
-    # TODO Add an example video to a pandas database
-    video_database = pd.read_csv('video_database.csv', index_col=0)
-    clips = twitch.get_clips(broadcaster_id="37402112", first=2)
-    clip = clips["data"][1]
-
-    video_database.loc[clip["video_id"]] = {
-        'id': clip["id"],
-        'video_title': clip["title"],
-        'rating': 5,  # example
-        'clip_use': "yes",  # example
-        'clip_title': "My First Example Video",  # example
-        'video_use': "yes",  # example
-        'broadcaster_name': clip["broadcaster_name"],
-        'broadcaster_id': clip["broadcaster_id"],
-        'game_name': twitch.get_games([clip["game_id"]])["data"][0]["name"],
-        'game_id': clip["game_id"],
-        'video_url': clip["url"],
-        'video_mp4': clip["thumbnail_url"].split("-preview")[0] + ".mp4",
-        'thumbnail_jpg': clip["thumbnail_url"],
-        'view_count': clip["view_count"],
-        'time_created': clip["created_at"],  # might want to alter this (maybe turn into datetime)
-        'duration': clip["duration"]
-    }
-
-    video_database.to_csv('video_database.csv')
-
-    # video ID?
-    # id
-    # title
-    # rating
-    # use as clip
-    # clip title
-    # use in video
-    # broadcaster
-    # broadcaster ID
-    # game
-    # game ID
-    # url
-    # video mp4
-    # thumbnail url
-    # view count
-    # time created
-    # duration
-    # / language
-    # / creator ID
-    # / creator name
-    # / embed url
-    # None of these are negotiable
-    # Some systems will use this data without the twitch api
 
 # TO DO Function to fix outdated clip info
 
