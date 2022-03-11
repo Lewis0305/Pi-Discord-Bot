@@ -128,25 +128,54 @@ async def scrape_videos(ctx):
 @bot.command()
 async def add_video(ctx):
     # TODO Add an example video to a pandas database
-    video_database = pd.read_csv('video_database.csv')
+    video_database = pd.read_csv('video_database.csv', index_col=0)
+    clips = twitch.get_clips(broadcaster_id="37402112", first=2)
+    clip = clips["data"][1]
+
+    video_database.loc[clip["video_id"]] = {
+        'id': clip["id"],
+        'video_title': clip["title"],
+        'rating': 5,  # example
+        'clip_use': "yes",  # example
+        'clip_title': "My First Example Video",  # example
+        'video_use': "yes",  # example
+        'broadcaster_name': clip["broadcaster_name"],
+        'broadcaster_id': clip["broadcaster_id"],
+        'game_name': twitch.get_games([clip["game_id"]])["data"][0]["name"],
+        'game_id': clip["game_id"],
+        'video_url': clip["url"],
+        'video_mp4': clip["thumbnail_url"].split("-preview")[0] + ".mp4",
+        'thumbnail_jpg': clip["thumbnail_url"],
+        'view_count': clip["view_count"],
+        'time_created': clip["created_at"],  # might want to alter this (maybe turn into datetime)
+        'duration': clip["duration"]
+    }
+
+    video_database.to_csv('video_database.csv')
+
+    # video ID?
     # id
     # title
+    # rating
+    # use as clip
+    # clip title
+    # use in video
     # broadcaster
     # broadcaster ID
     # game
     # game ID
-    # video ID?
     # url
     # video mp4
+    # thumbnail url
     # view count
     # time created
-    # thumbnail url
     # duration
     # / language
     # / creator ID
     # / creator name
     # / embed url
-    pass
+    # None of these are negotiable
+    # Some systems will use this data without the twitch api
 
 # TO DO Function to fix outdated clip info
 
