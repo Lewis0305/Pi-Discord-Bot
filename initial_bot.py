@@ -23,9 +23,11 @@ async def status(ctx):
 @bot.command()
 async def video_test(ctx):
 
-
     week_ago = dt.datetime.now() - dt.timedelta(days=7)
+    # TODO Make database file for game/broadcaster ids
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
+
+    print(clips["data"][0])
 
     for n in range(30):
         await ctx.send(".\n\n\n\n\n\n.")
@@ -126,6 +128,24 @@ async def scrape_videos(ctx):
 @bot.command()
 async def add_video(ctx):
     # TODO Add an example video to a pandas database
+    video_database = pd.read_csv('video_database.csv')
+    # id
+    # title
+    # broadcaster
+    # broadcaster ID
+    # game
+    # game ID
+    # video ID?
+    # url
+    # video mp4
+    # view count
+    # time created
+    # thumbnail url
+    # duration
+    # / language
+    # / creator ID
+    # / creator name
+    # / embed url
     pass
 
 # TO DO Function to fix outdated clip info
