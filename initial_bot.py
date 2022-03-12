@@ -65,21 +65,21 @@ async def video_test(ctx):
     # print(clips["data"][0])
 
     for n in range(30):
+        clip = clips["data"][n]
         await ctx.send(".\n\n\n\n\n\n.")
 
         # TODO Edit database info at the start of editing to avoid duplicates
 
         # INTRO ##########################################################################################
-        if clips["data"][n]["duration"] > 50:
-            message = ("Title: **" + clips["data"][n]["title"] + "**" +
-                       "\nBroadcaster: **" + clips["data"][n]["broadcaster_name"] + "**" +
-                       "\t\tGame: **" + twitch.get_games([clips["data"][n]["game_id"]])["data"][0]["name"] + "**\n" +
-                       clips["data"][n]["url"])
+        if clip["duration"] > 50:
+            url = clip["url"]
         else:
-            message = ("Title: **" + clips["data"][n]["title"] + "**" +
-                       "\nBroadcaster: **" + clips["data"][n]["broadcaster_name"] + "**" +
-                       "\t\tGame: **" + twitch.get_games([clips["data"][n]["game_id"]])["data"][0]["name"] + "**\n" +
-                       clips["data"][n]["thumbnail_url"].split("-preview")[0] + ".mp4")
+            url = clip["thumbnail_url"].split("-preview")[0] + ".mp4"
+
+        message = ("Title: **" + clip["title"] + "**" +
+                   "\nBroadcaster: **" + clip["broadcaster_name"] + "**" +
+                   "\t\tGame: **" + twitch.get_games([clip["game_id"]])["data"][0]["name"] + "**\n" +
+                   url)
 
         # RATING #########################################################################################
         rate_message = await ctx.send(message, components=[
@@ -155,7 +155,7 @@ async def video_test(ctx):
         await video_message.edit(f"*Use in a Video: **{interaction_video.component.label}***." +
                                  f" By {interaction_video.author}", components=[])
 
-        add_video(clips["data"][n], clip_rating)
+        add_video(clip, clip_rating)
 
 
 @bot.command()
