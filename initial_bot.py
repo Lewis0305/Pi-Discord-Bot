@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, SelectOption, Select
 from twitchAPI.twitch import Twitch
 import pandas as pd
+import random
 from dataclasses import dataclass  # simple structs
 import datetime as dt
 import config
@@ -61,7 +62,7 @@ async def video_test(ctx):
     # TODO Make database file for game/broadcaster ids
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
 
-    print(clips["data"][0])
+    # print(clips["data"][0])
 
     for n in range(30):
         await ctx.send(".\n\n\n\n\n\n.")
@@ -167,7 +168,23 @@ async def scrape_videos(ctx):
 
 @bot.command()
 async def video_rated(ctx, *args):
-    # TODO Function to show clip of given rating (optional: broadcaster)
-    print(args)
+    video_database = pd.read_csv('video_database.csv', index_col=0)
+    videos = video_database.loc[video_database['rating'] == int(args[0])]
+
+    if videos.shape[0] != 0:
+        random.seed(dt.datetime.now())
+        index = random.randrange(videos.shape[0])
+        video = videos.iloc[index]
+        if video['duration'] < 55:
+            url = video['video_mp4']
+        else:
+            url = video['video_url']
+        message = ("Title: **" + video['video_title'] + "**" +
+                   "\nBroadcaster: **" + video['broadcaster_name'] + "**" +
+                   "\t\tGame: **" + video['game_name'] + "**\n" +
+                   url)
+        await ctx.send(message)
+    else:
+        await ctx.send(f"No videos rated {args[0]}")
 
 bot.run(config.DISCORD_TOKEN)
