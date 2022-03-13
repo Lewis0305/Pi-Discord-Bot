@@ -31,10 +31,10 @@ def add_video(clip_info, rate_info, database='video_database.csv'):
     video_database.loc[clip_info["video_id"]] = {
         'id': clip_info["id"],
         'video_title': clip_info["title"],
-        'rating': rate_info.rating,  # example
-        'clip_use': rate_info.clip_use,  # example
-        'clip_title': rate_info.clip_title,  # example
-        'video_use': rate_info.video_use,  # example
+        'rating': rate_info.rating,
+        'clip_use': rate_info.clip_use,
+        'clip_title': rate_info.clip_title,
+        'video_use': rate_info.video_use,
         'broadcaster_name': clip_info["broadcaster_name"],
         'broadcaster_id': clip_info["broadcaster_id"],
         'game_name': twitch.get_games([clip_info["game_id"]])["data"][0]["name"],
@@ -60,6 +60,8 @@ async def video_test(ctx):
 
     week_ago = dt.datetime.now() - dt.timedelta(days=7)
     # TODO Make database file for game/broadcaster ids
+
+    # TODO Pull from raw clip database
     clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
 
     # print(clips["data"][0])
@@ -158,12 +160,38 @@ async def video_test(ctx):
         add_video(clip, clip_rating)
 
 
-@bot.command()
+@bot.command()  # This will be a normal function
 async def scrape_videos(ctx):
+    month_ago = dt.datetime.now() - dt.timedelta(days=30)
+    clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=month_ago)
+
+    # TODO Fill out games csv (games that are popular or that we want videos for)
+    # TODO Fill out broadcaster csv (broadcasters that are popular or that we want videos of)
+
+    # TODO Make Scrape Database
+
+    # TODO Automate: Dataframe for each channel?
+
+    # TODO Get Top Games (and check the usual)
+    games = twitch.get_top_games()  # sorted by current active viewers
+    print(games)
+
+    # TODO Get Top Broadcasters (Not known: how to do this)
+
+    # Initialize data to lists.
+    data = clips["data"]
+
+    # Creates DataFrame.
+    df = pd.DataFrame(data)
+
+    # Print the data
+    print(df.iloc[0])
+    print(df)
+
     # TODO Add mass amounts of videos to database (without duplicates)
     pass
 
-# TO DO Function to fix outdated clip info
+# TO DO Function to fix outdated clip info (as needed?)
 
 
 @bot.command()
