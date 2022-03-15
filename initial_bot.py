@@ -17,7 +17,7 @@ my_app_secret = config.TWITCH_CLIENT_SECRET
 twitch = Twitch(client_id, my_app_secret)
 
 
-@dataclass
+@dataclass  # python struct functionality
 class RateInfo:
     rating: int
     clip_use: str = "no"
@@ -172,10 +172,6 @@ async def scrape_videos(ctx):
 
     # TODO Automate: Dataframe for each channel?
 
-    # TODO Get Top Games (and check the usual)
-    games = twitch.get_top_games()  # sorted by current active viewers
-    print(games)
-
     # TODO Get Top Broadcasters (Not known: how to do this)
 
     # Initialize data to lists.
@@ -189,6 +185,7 @@ async def scrape_videos(ctx):
     print(df)
 
     # TODO Add mass amounts of videos to database (without duplicates)
+    # TODO Two programs: discord bot, twitch trend/activity monitor
     pass
 
 # TO DO Function to fix outdated clip info (as needed?)
@@ -214,5 +211,28 @@ async def video_rated(ctx, *args):
         await ctx.send(message)
     else:
         await ctx.send(f"No videos rated {args[0]}")
+
+
+def twitch_vid_test():
+    month_ago = dt.datetime.now() - dt.timedelta(days=30)
+
+    # Adds any new games that have reached the current top 10
+    game_database = pd.read_csv('games.csv', index_col=0)
+    games = twitch.get_top_games(first=10)  # sorted by current active viewers
+    for n in games["data"]:
+        game = n
+        if int(game["id"]) not in game_database.index:
+            game_database.loc[game["id"]] = [game["name"]]
+    game_database.to_csv('games.csv')
+
+    # Adds any new casters that have reached the current top 15 clips
+    caster_database = pd.read_csv('broadcasters.csv', index_col=0)
+    clip_by_id = twitch.get_clips(game_id="509658", first=15, started_at=month_ago)
+    for n in clip_by_id["data"]:
+        clip = n
+        if int(clip["broadcaster_id"]) not in caster_database.index:
+            print(clip["broadcaster_id"] + "," + clip["broadcaster_name"])
+            # caster_database.loc[clip["broadcaster_id"]] = [clip["broadcaster_name"]]
+    caster_database.to_csv('broadcasters.csv')
 
 bot.run(config.DISCORD_TOKEN)
