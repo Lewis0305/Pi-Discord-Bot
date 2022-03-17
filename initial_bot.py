@@ -58,19 +58,18 @@ async def status(ctx):
 @bot.command()
 async def video_test(ctx):
 
-    week_ago = dt.datetime.now() - dt.timedelta(days=7)
-    # TODO Make database file for game/broadcaster ids
-
-    # TODO Pull from raw clip database
-    clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=week_ago)
+    scrape_csv = 'twitch_scrape.csv'
+    scrape_database = pd.read_csv(scrape_csv, index_col=0)
 
     # print(clips["data"][0])
 
     for n in range(30):
-        clip = clips["data"][n]
+        # clip = clips["data"][n]
+        scrape_csv = 'twitch_scrape.csv'
+        scrape_database = pd.read_csv(scrape_csv, index_col=0)
+        clip = twitch.get_clips(clip_id=scrape_database.index[0])["data"][0]
+        scrape_database.drop(index=scrape_database.index[0], axis=0, inplace=True)
         await ctx.send(".\n\n\n\n\n\n.")
-
-        # TODO Edit database info at the start of editing to avoid duplicates
 
         # INTRO ##########################################################################################
         if clip["duration"] > 50:
@@ -159,14 +158,29 @@ async def video_test(ctx):
 
         add_video(clip, clip_rating)
 
+        scrape_database.to_csv(scrape_csv)
+
 
 @bot.command()  # This will be a normal function
 async def scrape_videos(ctx):
-    month_ago = dt.datetime.now() - dt.timedelta(days=30)
-    clips = twitch.get_clips(broadcaster_id="37402112", first=30, started_at=month_ago)
+    scrape_csv = 'twitch_scrape.csv'
+    scrape_database = pd.read_csv(scrape_csv, index_col=0)
 
-    # TODO Fill out games csv (games that are popular or that we want videos for)
-    # TODO Fill out broadcaster csv (broadcasters that are popular or that we want videos of)
+    month_ago = dt.datetime.now() - dt.timedelta(days=30)
+    clips = twitch.get_clips(broadcaster_id="71092938", first=30, started_at=month_ago)
+
+    for clip in clips["data"]:
+        if clip["id"] not in scrape_database.index:
+            scrape_database.loc[clip["id"]] = [clip["broadcaster_id"],
+                                               clip["game_id"],
+                                               clip["created_at"],
+                                               clip["view_count"]]
+        else:
+            pass  # print(clip['id'] + ": Duplicate")
+
+    scrape_database.to_csv(scrape_csv)
+
+
 
     # TODO Make Scrape Database
 
@@ -182,13 +196,11 @@ async def scrape_videos(ctx):
 
     # Print the data
     print(df.iloc[0])
-    print(df)
+    #print(df)
 
     # TODO Add mass amounts of videos to database (without duplicates)
     # TODO Two programs: discord bot, twitch trend/activity monitor
     pass
-
-# TO DO Function to fix outdated clip info (as needed?)
 
 
 @bot.command()
@@ -214,6 +226,9 @@ async def video_rated(ctx, *args):
 
 
 def twitch_vid_test():
+    # TODO Fill out games csv (games that are popular or that we want videos for)
+    # TODO Fill out broadcaster csv (broadcasters that are popular or that we want videos of)
+
     month_ago = dt.datetime.now() - dt.timedelta(days=30)
 
     # Adds any new games that have reached the current top 10
@@ -234,5 +249,7 @@ def twitch_vid_test():
             print(clip["broadcaster_id"] + "," + clip["broadcaster_name"])
             # caster_database.loc[clip["broadcaster_id"]] = [clip["broadcaster_name"]]
     caster_database.to_csv('broadcasters.csv')
+
+# TO DO Function to fix outdated clip info (as needed?)
 
 bot.run(config.DISCORD_TOKEN)
