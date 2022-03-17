@@ -67,6 +67,7 @@ async def video_test(ctx):
         # clip = clips["data"][n]
         scrape_csv = 'twitch_scrape.csv'
         scrape_database = pd.read_csv(scrape_csv, index_col=0)
+
         clip = twitch.get_clips(clip_id=scrape_database.index[0])["data"][0]
         scrape_database.drop(index=scrape_database.index[0], axis=0, inplace=True)
         await ctx.send(".\n\n\n\n\n\n.")
@@ -161,24 +162,29 @@ async def video_test(ctx):
         scrape_database.to_csv(scrape_csv)
 
 
+
 @bot.command()  # This will be a normal function
 async def scrape_videos(ctx):
     scrape_csv = 'twitch_scrape.csv'
     scrape_database = pd.read_csv(scrape_csv, index_col=0)
+    archive_csv = 'archive.csv'
+    archive_database = pd.read_csv(archive_csv, index_col=0)
 
     month_ago = dt.datetime.now() - dt.timedelta(days=30)
     clips = twitch.get_clips(broadcaster_id="71092938", first=30, started_at=month_ago)
 
     for clip in clips["data"]:
-        if clip["id"] not in scrape_database.index:
+        if clip["id"] not in archive_database.index:
             scrape_database.loc[clip["id"]] = [clip["broadcaster_id"],
                                                clip["game_id"],
                                                clip["created_at"],
                                                clip["view_count"]]
+            archive_database.loc[clip["id"]] = [clip["video_id"]]
         else:
             pass  # print(clip['id'] + ": Duplicate")
 
     scrape_database.to_csv(scrape_csv)
+    archive_database.to_csv(archive_csv)
 
 
 
