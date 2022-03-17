@@ -158,13 +158,13 @@ async def video_test(ctx):
                                  f" By {interaction_video.author}", components=[])
 
         add_video(clip, clip_rating)
-
         scrape_database.to_csv(scrape_csv)
-
 
 
 @bot.command()  # This will be a normal function
 async def scrape_videos(ctx):
+    # TODO Intelligent Video Scraping Process
+
     scrape_csv = 'twitch_scrape.csv'
     scrape_database = pd.read_csv(scrape_csv, index_col=0)
     archive_csv = 'archive.csv'
@@ -186,26 +186,9 @@ async def scrape_videos(ctx):
     scrape_database.to_csv(scrape_csv)
     archive_database.to_csv(archive_csv)
 
-
-
-    # TODO Make Scrape Database
-
     # TODO Automate: Dataframe for each channel?
 
-    # TODO Get Top Broadcasters (Not known: how to do this)
-
-    # Initialize data to lists.
-    data = clips["data"]
-
-    # Creates DataFrame.
-    df = pd.DataFrame(data)
-
-    # Print the data
-    print(df.iloc[0])
-    #print(df)
-
-    # TODO Add mass amounts of videos to database (without duplicates)
-    # TODO Two programs: discord bot, twitch trend/activity monitor
+    # Future TODO Two programs: discord bot, twitch trend/activity monitor
     pass
 
 
@@ -257,5 +240,6 @@ def twitch_vid_test():
     caster_database.to_csv('broadcasters.csv')
 
 # TO DO Function to fix outdated clip info (as needed?)
+
 
 bot.run(config.DISCORD_TOKEN)
