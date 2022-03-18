@@ -16,6 +16,13 @@ client_id = config.TWITCH_CLIENT_ID
 my_app_secret = config.TWITCH_CLIENT_SECRET
 twitch = Twitch(client_id, my_app_secret)
 
+# DATABASES
+video_csv = 'video_database.csv'
+scrape_csv = 'twitch_scrape.csv'
+archive_csv = 'archive.csv'
+games_csv = 'games.csv'
+broadcaster_csv = 'broadcasters.csv'
+
 
 @dataclass  # python struct functionality
 class RateInfo:
@@ -25,11 +32,10 @@ class RateInfo:
     clip_title: str = ""
 
 
-def add_video(clip_info, rate_info, database='video_database.csv'):
-    video_database = pd.read_csv(database, index_col=0)
+def add_video(clip_info, rate_info):
+    video_database = pd.read_csv(video_csv, index_col=0)
 
-    video_database.loc[clip_info["video_id"]] = {
-        'id': clip_info["id"],
+    video_database.loc[clip_info["id"]] = {
         'video_title': clip_info["title"],
         'rating': rate_info.rating,
         'clip_use': rate_info.clip_use,
@@ -47,7 +53,7 @@ def add_video(clip_info, rate_info, database='video_database.csv'):
         'duration': clip_info["duration"]
     }
 
-    video_database.to_csv(database)
+    video_database.to_csv(video_csv)
 
 
 @bot.command()
@@ -57,15 +63,7 @@ async def status(ctx):
 
 @bot.command()
 async def video_test(ctx):
-
-    scrape_csv = 'twitch_scrape.csv'
-    scrape_database = pd.read_csv(scrape_csv, index_col=0)
-
-    # print(clips["data"][0])
-
     for n in range(30):
-        # clip = clips["data"][n]
-        scrape_csv = 'twitch_scrape.csv'
         scrape_database = pd.read_csv(scrape_csv, index_col=0)
 
         clip = twitch.get_clips(clip_id=scrape_database.index[0])["data"][0]
@@ -163,15 +161,13 @@ async def video_test(ctx):
 
 @bot.command()  # This will be a normal function
 async def scrape_videos(ctx):
-    # TODO Intelligent Video Scraping Process
+    # TODO Intelligent Video Scraping Process (BASED ON MY YT CHANNELS)
 
-    scrape_csv = 'twitch_scrape.csv'
     scrape_database = pd.read_csv(scrape_csv, index_col=0)
-    archive_csv = 'archive.csv'
     archive_database = pd.read_csv(archive_csv, index_col=0)
 
     month_ago = dt.datetime.now() - dt.timedelta(days=30)
-    clips = twitch.get_clips(broadcaster_id="71092938", first=30, started_at=month_ago)
+    clips = twitch.get_clips(broadcaster_id="94753024", first=10, started_at=month_ago)
 
     for clip in clips["data"]:
         if clip["id"] not in archive_database.index:
@@ -179,14 +175,14 @@ async def scrape_videos(ctx):
                                                clip["game_id"],
                                                clip["created_at"],
                                                clip["view_count"]]
-            archive_database.loc[clip["id"]] = [clip["video_id"]]
+            archive_database.loc[clip["id"]] = [clip["url"]]
         else:
             pass  # print(clip['id'] + ": Duplicate")
 
     scrape_database.to_csv(scrape_csv)
     archive_database.to_csv(archive_csv)
 
-    # TODO Automate: Dataframe for each channel?
+    # TODO Automate: Dataframe for each channel? (I WILL PROBABLY MAKE THIS)
 
     # Future TODO Two programs: discord bot, twitch trend/activity monitor
     pass
@@ -194,7 +190,7 @@ async def scrape_videos(ctx):
 
 @bot.command()
 async def video_rated(ctx, *args):
-    video_database = pd.read_csv('video_database.csv', index_col=0)
+    video_database = pd.read_csv(video_csv, index_col=0)
     videos = video_database.loc[video_database['rating'] == int(args[0])]
 
     if videos.shape[0] != 0:
@@ -216,28 +212,27 @@ async def video_rated(ctx, *args):
 
 def twitch_vid_test():
     # TODO Fill out games csv (games that are popular or that we want videos for)
+
     # TODO Fill out broadcaster csv (broadcasters that are popular or that we want videos of)
 
-    month_ago = dt.datetime.now() - dt.timedelta(days=30)
-
     # Adds any new games that have reached the current top 10
-    game_database = pd.read_csv('games.csv', index_col=0)
+    game_database = pd.read_csv(games_csv, index_col=0)
     games = twitch.get_top_games(first=10)  # sorted by current active viewers
     for n in games["data"]:
         game = n
         if int(game["id"]) not in game_database.index:
             game_database.loc[game["id"]] = [game["name"]]
-    game_database.to_csv('games.csv')
+    game_database.to_csv(games_csv)
 
     # Adds any new casters that have reached the current top 15 clips
-    caster_database = pd.read_csv('broadcasters.csv', index_col=0)
+    caster_database = pd.read_csv(broadcaster_csv, index_col=0)
+    month_ago = dt.datetime.now() - dt.timedelta(days=30)
     clip_by_id = twitch.get_clips(game_id="509658", first=15, started_at=month_ago)
-    for n in clip_by_id["data"]:
-        clip = n
+    for clip in clip_by_id["data"]:
         if int(clip["broadcaster_id"]) not in caster_database.index:
             print(clip["broadcaster_id"] + "," + clip["broadcaster_name"])
             # caster_database.loc[clip["broadcaster_id"]] = [clip["broadcaster_name"]]
-    caster_database.to_csv('broadcasters.csv')
+    caster_database.to_csv(broadcaster_csv)
 
 # TO DO Function to fix outdated clip info (as needed?)
 
