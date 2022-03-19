@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, SelectOption, Select
+from wakeonlan import send_magic_packet
 from twitchAPI.twitch import Twitch
 import pandas as pd
 import random
@@ -17,6 +18,17 @@ DiscordComponents(bot)
 client_id = config.TWITCH_CLIENT_ID
 my_app_secret = config.TWITCH_CLIENT_SECRET
 twitch = Twitch(client_id, my_app_secret)
+
+
+@bot.command()
+async def status(ctx):
+    await ctx.send('Pi Bot: ONLINE')
+
+
+@bot.command()
+async def wake_d2(ctx):
+    send_magic_packet('D0-50-99-A7-88-AE')
+    await ctx.send('Waking D2')
 
 
 @dataclass  # python struct functionality
@@ -49,11 +61,6 @@ def add_video(clip_info, rate_info):
     }
 
     video_database.to_csv(config.VIDEO_CSV)
-
-
-@bot.command()
-async def status(ctx):
-    await ctx.send('Pi Bot: ONLINE')
 
 
 @bot.command()
