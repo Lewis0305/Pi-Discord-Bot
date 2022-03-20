@@ -1,4 +1,63 @@
 import socket
+import threading
+
+HEADER = 64
+PORT = 5000
+SERVER = socket.gethostbyname(socket.gethostname())  # Finds a IP it likes (can be a string of ip)
+ADDR = (SERVER, PORT)
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(ADDR)
+
+
+def get_url(slug):
+    return f"URL To Video {slug}"
+
+
+def get_rating(slug):
+    return f"Rating For Video {slug}"
+
+
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+
+    connected = True
+    while connected:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
+                conn.send("Successful Disconnected".encode(FORMAT))
+                break
+
+            print(f"[{addr}] {msg}")
+            response = eval(msg)
+            print(response)
+            conn.send(response.encode(FORMAT))
+
+    conn.close()
+
+
+def start():
+    server.listen()
+    print(f"[LISTENING] Server is listening on {SERVER}")
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+
+
+print("[STARTING] server is starting...")
+start()
+
+"""
+import socket
 
 # take the server name and port name
 
@@ -10,9 +69,12 @@ port = 5000
 s = socket.socket(socket.AF_INET,
                   socket.SOCK_STREAM)
 
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
 # connect it to server and port
 # number on local computer.
-s.connect(('192.168.1.2', port))
+# s.connect(('192.168.1.2', port))
+s.connect(('192.168.1.17', port))
 
 # receive message string from
 # server, at a time 1024 B
@@ -26,3 +88,4 @@ while msg:
 
 # disconnect the client
 s.close()
+"""

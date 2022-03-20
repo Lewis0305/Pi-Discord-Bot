@@ -7,6 +7,38 @@
 #send_magic_packet('9C.B6.D0.09.A8.EC')
 
 import socket
+
+HEADER = 64
+PORT = 5000
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+SERVER = "169.254.27.180"
+ADDR = (SERVER, PORT)
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDR)
+
+
+def send(msg):
+    message = msg.encode(FORMAT)
+    msg_length = len(message)
+    send_length = str(msg_length).encode(FORMAT)
+    send_length += b' ' * (HEADER - len(send_length))
+    client.send(send_length)
+    client.send(message)
+    print(client.recv(2048).decode(FORMAT))
+
+
+send("get_url(5)")
+input()
+send("get_rating(4)")
+input()
+send("get_url(2)")
+
+send(DISCONNECT_MESSAGE)
+
+"""
+import socket
   
 # take the server name and port name
 host = 'local host'
@@ -37,11 +69,11 @@ print("CONNECTION FROM:", str(addr))
   
 # send message to the client after
 # encoding into binary string
-c.send(b"HELLO, How are you ? \
-       Welcome to Akash hacking World")
+c.send(b"HELLO, How are you ?")
  
 msg = "Bye.............."
 c.send(msg.encode())
   
 # disconnect the server
 c.close()
+"""
