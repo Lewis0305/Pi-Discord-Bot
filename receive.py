@@ -1,8 +1,11 @@
 import socket
+import io
+import csv
 import threading
+import pandas as pd
 
 HEADER = 64
-PORT = 5000
+PORT = 5070
 SERVER = socket.gethostbyname(socket.gethostname())  # Finds a IP it likes (can be a string of ip)
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
@@ -12,13 +15,23 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(ADDR)
 
+video_database = pd.read_csv('broadcasters.csv', index_col=0)
+print(video_database.iloc[0])
+
+text = open("broadcasters.csv", "r")
+text = ' '.join([i for i in text])
+
+
+def get_video_database():
+    return str(text)
+
 
 def get_url(slug):
-    return f"URL To Video {slug}"
+    return str(video_database.iloc[0]["video_url"])
 
 
 def get_rating(slug):
-    return f"Rating For Video {slug}"
+    return str(video_database.iloc[0]["rating"])
 
 
 def handle_client(conn, addr):
