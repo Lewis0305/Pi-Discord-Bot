@@ -7,9 +7,10 @@
 #send_magic_packet('9C.B6.D0.09.A8.EC')
 
 import socket
+import pandas as pd
 
 HEADER = 64
-PORT = 5000
+PORT = 5070
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "169.254.27.180"
@@ -18,7 +19,7 @@ ADDR = (SERVER, PORT)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
-
+print("Connected")
 def send(msg):
     message = msg.encode(FORMAT)
     msg_length = len(message)
@@ -26,10 +27,19 @@ def send(msg):
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+    print("Sent")
+    # TODO This can only send 5000 rows (Should only add new entries (requires change to the file write))
+    response = client.recv(5000).decode(FORMAT)
+    print(response)
+    text_file = open("test.csv", "w")
+    a = text_file.write(response)
+    text_file.close()
+
+    data = pd.read_csv('test.csv', index_col=0)
+    print(data.iloc[0]["name"])
 
 
-send("get_url(5)")
+send("get_video_database()")
 input()
 send("get_rating(4)")
 input()
@@ -50,7 +60,6 @@ s = socket.socket(socket.AF_INET,
                   socket.SOCK_STREAM)
   
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
   
 # bind the socket with server
 # and port number
