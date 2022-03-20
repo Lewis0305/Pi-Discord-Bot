@@ -192,7 +192,7 @@ async def scrape_videos(ctx):
 
 @bot.command()
 async def video_rated(ctx, *args):
-    video_database = pd.read_csv(video_csv, index_col=0)
+    video_database = pd.read_csv(config.VIDEO_CSV, index_col=0)
     videos = video_database.loc[video_database['rating'] == int(args[0])]
 
     if videos.shape[0] != 0:
