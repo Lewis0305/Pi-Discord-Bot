@@ -64,9 +64,11 @@ def add_video(clip_info, rate_info):
 
 
 @bot.command()
-async def video_test(ctx):
-    for n in range(30):
+async def rating_loop(ctx):
+    while True:
         scrape_database = pd.read_csv(config.SCRAPE_CSV, index_col=0)
+
+        # TODO If not clips in database: 'continue' loop
 
         clip = twitch.get_clips(clip_id=scrape_database.index[0])["data"][0]
         scrape_database.drop(index=scrape_database.index[0], axis=0, inplace=True)
