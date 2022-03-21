@@ -2,6 +2,8 @@ import socket
 import threading
 import pandas as pd
 
+# THIS IS ON THE PI
+
 HEADER = 64
 PORT = 5070
 SERVER = socket.gethostbyname(socket.gethostname())  # Finds a IP it likes (can be a string of ip)

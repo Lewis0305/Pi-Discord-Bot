@@ -184,9 +184,10 @@ async def scrape_videos(ctx):
     scrape_database.to_csv(config.SCRAPE_CSV)
     archive_database.to_csv(config.ARCHIVE_CSV)
 
-    # TODO Automate: Dataframe for each channel? (I WILL PROBABLY MAKE THIS)
+    # No TO DO Automate: Dataframe for each channel? (I WILL PROBABLY MAKE THIS)
 
-    # Future TODO Two programs: discord bot, twitch trend/activity monitor
+
+    # TODO Four programs: discord bot, twitch trend/activity monitor, Server, Client
     pass
 
 

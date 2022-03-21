@@ -8,12 +8,15 @@
 
 import socket
 import pandas as pd
+import config
+
+# THIS IS ON D 2
 
 HEADER = 64
 PORT = 5070
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "169.254.27.180"
+SERVER = config.LAPTOP_IP
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,10 +45,10 @@ def send(msg):
 
 
 send("get_video_database()")
-input()
-send("get_rating(4)")
-input()
-send("get_url(2)")
+# input()
+# send("get_rating(4)")
+# input()
+# send("get_url(2)")
 
 send(DISCONNECT_MESSAGE)
 
