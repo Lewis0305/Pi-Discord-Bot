@@ -12,10 +12,18 @@ twitch = Twitch(client_id, my_app_secret)
 broadcasters_database = pd.read_csv(config.BROADCASTER_CSV, index_col=0)
 games_database = pd.read_csv(config.GAMES_CSV, index_col=0)
 
+# TODO Four programs: discord bot, twitch trend/activity monitor, Server, Client
 
-def scrape_videos():
-    # TODO Intelligent Video Scraping Process (BASED ON MY YT CHANNELS)
+# TODO Intelligent Video Scraping Process (BASED ON MY YT CHANNELS)
 
+
+def Start():
+    # GET Database of Channels (What to look for in clips, last time upload, ect)
+    # GET Channel Databases (Maybe The Archive or implement that into the main database)
+    pass
+
+
+def scrape_videos_example():
     scrape_database = pd.read_csv(config.SCRAPE_CSV, index_col=0)
     archive_database = pd.read_csv(config.ARCHIVE_CSV, index_col=0)
 
@@ -36,12 +44,10 @@ def scrape_videos():
     archive_database.to_csv(config.ARCHIVE_CSV)
 
     # No TO DO Automate: Dataframe for each channel? (I WILL PROBABLY MAKE THIS)
-
-    # TODO Four programs: discord bot, twitch trend/activity monitor, Server, Client
     pass
 
 
-def twitch_vid_test():
+def twitch_vid_example():
     # Adds any new games that have reached the current top 10
     game_database = pd.read_csv(config.GAMES_CSV, index_col=0)
     games = twitch.get_top_games(first=10)  # sorted by current active viewers
