@@ -16,7 +16,7 @@ HEADER = 64
 PORT = 5070
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = config.LAPTOP_IP
+SERVER = config.LAPTOP_IP_CAMPUS
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,16 +32,17 @@ def send(msg):
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
-    print("Sent")
+    print("Sent:\n" + msg)
     # TODO This can only send 5000 rows (Should only add new entries (requires change to the file write))
+    # TODO Only New Entry method will not account for modified rows
     response = client.recv(5000).decode(FORMAT)
-    print(response)
+    print("\nRESPONSE:\n" + response + "\n\n")
     text_file = open("test.csv", "w")
     a = text_file.write(response)
     text_file.close()
 
     data = pd.read_csv('test.csv', index_col=0)
-    print(data.iloc[0]["name"])
+    print("Grab name from Dataframe:\n" + data.iloc[0]["name"])
 
 
 send("get_video_database()")
@@ -50,7 +51,8 @@ send("get_video_database()")
 # input()
 # send("get_url(2)")
 
-send(DISCONNECT_MESSAGE)
+# Doesn't work with this send function
+# send(DISCONNECT_MESSAGE)
 
 """
 import socket
