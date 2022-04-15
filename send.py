@@ -11,18 +11,16 @@ import pandas as pd
 import config
 
 # THIS IS ON D 2
-
+print(socket.gethostbyname(socket.gethostname()))
 HEADER = 64
 PORT = 5070
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = config.LAPTOP_IP_CAMPUS
+SERVER = config.LAPTOP_IP  # Needs static IP
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
-
-# print("Connected")
 
 
 def send(msg):
@@ -35,17 +33,42 @@ def send(msg):
     print("Sent:\n" + msg)
     # TODO This can only send 5000 rows (Should only add new entries (requires change to the file write))
     # TODO Only New Entry method will not account for modified rows
-    response = client.recv(5000).decode(FORMAT)
-    print("\nRESPONSE:\n" + response + "\n\n")
-    text_file = open("test.csv", "w")
-    a = text_file.write(response)
-    text_file.close()
+    return client.recv(5000).decode(FORMAT)
 
+
+def data_response(message, csv):
+    response = message
+    data = response[4:]
+    if response[-4:] == "<!e>":
+        data = data[:-4]
+    else:
+        while True:
+            if response[-4:] == "<!e>":
+                data += response[:-4]
+                break
+            response = client.recv(5000).decode(FORMAT)
+            data += response
+
+    text_file = open(csv, "w")
+    a = text_file.write(data)
+    text_file.close()
+    """
     data = pd.read_csv('test.csv', index_col=0)
     print("Grab name from Dataframe:\n" + data.iloc[0]["name"])
+    """
 
 
-send("get_video_database()")
+msg = send("get_video_database()")
+if msg[:4] == "<!d>":
+    data_response(msg, "test.csv")
+
+
+
+
+
+
+
+
 # input()
 # send("get_rating(4)")
 # input()
