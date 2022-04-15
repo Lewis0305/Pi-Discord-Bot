@@ -15,22 +15,16 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(ADDR)
 
 video_database = pd.read_csv('broadcasters.csv', index_col=0)
-print(video_database.iloc[0])
-
-text = open("broadcasters.csv", "r")
-text = ' '.join([i for i in text])
 
 
-def get_video_database():
+def get_whole_database(csv):
+    text = open(csv, "r")
+    text = ' '.join([i for i in text])
     return str("<!d>" + text + "<!e>")
 
 
-def get_url(slug):
-    return str(video_database.iloc[0]["video_url"])
-
-
-def get_rating(slug):
-    return str(video_database.iloc[0]["rating"])
+def get_commands():
+    return "<!c>none atm<!e>"
 
 
 def handle_client(conn, addr):
@@ -43,13 +37,11 @@ def handle_client(conn, addr):
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
             if msg == DISCONNECT_MESSAGE:
-                connected = False
                 conn.send("Successful Disconnected".encode(FORMAT))
                 break
 
             print(f"[{addr}] {msg}")
             response = eval(msg)
-            print(response)
             conn.send(response.encode(FORMAT))
 
     conn.close()
