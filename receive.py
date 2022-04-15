@@ -3,7 +3,6 @@ import threading
 import pandas as pd
 
 # THIS IS ON THE PI
-
 HEADER = 64
 PORT = 5070
 SERVER = socket.gethostbyname(socket.gethostname())  # Finds a IP it likes (can be a string of ip)
@@ -23,7 +22,7 @@ text = ' '.join([i for i in text])
 
 
 def get_video_database():
-    return str(text)
+    return str("<!d>" + text + "<!e>")
 
 
 def get_url(slug):
