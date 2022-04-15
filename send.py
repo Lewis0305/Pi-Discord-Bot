@@ -36,8 +36,8 @@ def send(msg):
     return client.recv(5000).decode(FORMAT)
 
 
-def data_response(message, csv):
-    response = message
+def data_response(msg, csv):
+    response = msg
     data = response[4:]
     if response[-4:] == "<!e>":
         data = data[:-4]
@@ -58,15 +58,9 @@ def data_response(message, csv):
     """
 
 
-msg = send("get_video_database()")
-if msg[:4] == "<!d>":
-    data_response(msg, "test.csv")
-
-
-
-
-
-
+message = send("get_video_database()")
+if message[:4] == "<!d>":
+    data_response(message, "test.csv")
 
 
 # input()
