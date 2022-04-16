@@ -31,13 +31,7 @@ def send(msg):
     client.send(send_length)
     client.send(message)
     print("Sent:\n" + msg)
-    # TODO This can only send 5000 rows (Should only add new entries (requires change to the file write))
-    # TODO Only New Entry method will not account for modified rows
     return client.recv(5000).decode(FORMAT)
-
-
-def read_commands():
-    print("nice")
 
 
 def data_response(msg):
@@ -58,10 +52,10 @@ def data_response(msg):
     text_file = open(info[0], "w")
     a = text_file.write(data)
     text_file.close()
-    """
-    data = pd.read_csv('test.csv', index_col=0)
-    print("Grab name from Dataframe:\n" + data.iloc[0]["name"])
-    """
+
+
+def read_commands():
+    print("nice")
 
 
 message = send("get_whole_database(\"" + config.BROADCASTER_CSV[:-4] + "\")")
