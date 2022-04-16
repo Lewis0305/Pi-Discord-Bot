@@ -23,6 +23,7 @@ def get_whole_database(database):
     return str("<!d>" + "<" + database + "_d2.csv>" + text + "<!e>")
 
 
+# TODO Rename 'commands' to 'tasks' and add csv for the archive of old tasks
 def get_commands():
     return "<!c>none atm<!e>"
 
