@@ -41,7 +41,8 @@ def read_commands():
 
 
 def data_response(msg, csv):
-    data = msg
+    info = msg[1:].split(">", 1)
+    data = info[1]
     if data[-4:] == "<!e>":
         data = data[:-4]
     else:
@@ -53,7 +54,7 @@ def data_response(msg, csv):
             response = client.recv(5000).decode(FORMAT)
             data += response
 
-    text_file = open(csv, "w")
+    text_file = open(info[0], "w")
     a = text_file.write(data)
     text_file.close()
     """
