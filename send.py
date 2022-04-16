@@ -40,7 +40,7 @@ def read_commands():
     print("nice")
 
 
-def data_response(msg, csv):
+def data_response(msg):
     info = msg[1:].split(">", 1)
     data = info[1]
     if data[-4:] == "<!e>":
@@ -54,6 +54,7 @@ def data_response(msg, csv):
             response = client.recv(5000).decode(FORMAT)
             data += response
 
+    print(len(data))
     text_file = open(info[0], "w")
     a = text_file.write(data)
     text_file.close()
@@ -63,7 +64,7 @@ def data_response(msg, csv):
     """
 
 
-message = send("get_whole_database(\"broadcasters.csv\")")
+message = send("get_whole_database(\"" + config.BROADCASTER_CSV[:-4] + "\")")
 eval(config.COMM_PROC[message[:4]])
 
 message = send("get_commands()")

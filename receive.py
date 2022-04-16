@@ -17,10 +17,10 @@ server.bind(ADDR)
 video_database = pd.read_csv('broadcasters.csv', index_col=0)
 
 
-def get_whole_database(csv):
-    text = open(csv, "r")
+def get_whole_database(database):
+    text = open(database + ".csv", "r")
     text = ''.join([i for i in text])
-    return str("<!d>" + "<broadcasters2.csv>" + text + "<!e>")
+    return str("<!d>" + "<" + database + "_d2.csv>" + text + "<!e>")
 
 
 def get_commands():
