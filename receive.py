@@ -6,13 +6,13 @@ import pandas as pd
 HEADER = 64
 PORT = 5070
 SERVER = socket.gethostbyname(socket.gethostname())  # Finds a IP it likes (can be a string of ip)
-ADDR = (SERVER, PORT)
+ADDRESS = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind(ADDR)
+server.bind(ADDRESS)
 
 video_database = pd.read_csv('broadcasters.csv', index_col=0)
 
@@ -24,6 +24,10 @@ def get_whole_database(database):
 
 
 def get_commands():
+    return "<!c>none atm<!e>"
+
+
+def del_commands(command_id):
     return "<!c>none atm<!e>"
 
 
@@ -43,7 +47,6 @@ def handle_client(conn, addr):
             print(f"[{addr}] {msg}")
             response = eval(msg)
             conn.send(response.encode(FORMAT))
-
     conn.close()
 
 
