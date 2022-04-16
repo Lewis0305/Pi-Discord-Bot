@@ -1,11 +1,3 @@
-# from wakeonlan import send_magic_packet
-# send_magic_packet('D0-50-99-A7-88-AE')
-# send_magic_packet('4C.CC.6A.2E.3C.94')
-# send_magic_packet('9C.B6.D0.09.A8.EB')
-# send_magic_packet('9E.B6.D0.09.A8.EB')
-# send_magic_packet('AE.B6.D0.09.A8.EB')
-# send_magic_packet('9C.B6.D0.09.A8.EC')
-
 import socket
 import pandas as pd
 import config
@@ -17,10 +9,10 @@ PORT = 5070
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = config.LAPTOP_IP  # Needs static IP
-ADDR = (SERVER, PORT)
+ADDRESS = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
+client.connect(ADDRESS)
 
 
 def send(msg):
@@ -37,12 +29,12 @@ def send(msg):
 def data_response(msg):
     info = msg[1:].split(">", 1)
     data = info[1]
-    if data[-4:] == "<!e>":
+    if data[-4:] == config.COMM_PROC["end_token"]:
         data = data[:-4]
     else:
         response = data
         while True:
-            if response[-4:] == "<!e>":
+            if response[-4:] == config.COMM_PROC["end_token"]:
                 data += response[:-4]
                 break
             response = client.recv(5000).decode(FORMAT)
@@ -58,7 +50,7 @@ def read_commands():
     print("nice")
 
 
-message = send("get_whole_database(\"" + config.BROADCASTER_CSV[:-4] + "\")")
+message = send("get_whole_database(\"" + config.COMMANDS_CSV[:-4] + "\")")
 eval(config.COMM_PROC[message[:4]])
 
 message = send("get_commands()")
