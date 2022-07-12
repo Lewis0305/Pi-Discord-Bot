@@ -177,10 +177,10 @@ async def video_rated(ctx, *args):
             url = video['video_mp4']
         else:
             url = video['video_url']
-        message = ("Title: **" + video['video_title'] + "**" +
-                   "\nBroadcaster: **" + video['broadcaster_name'] + "**" +
-                   "\t\tGame: **" + video['game_name'] + "**\n" +
-                   url)
+        message = ("Title: **" + video['video_title'] + "**\n" +
+                   "Broadcaster: **" + video['broadcaster_name'] + "**\t\t" +
+                   "Game: **" + video['game_name'] + "**\n" +
+                   "Link: " + url)
         await ctx.send(message)
     else:
         await ctx.send(f"No videos rated {args[0]}")
