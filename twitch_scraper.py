@@ -14,13 +14,12 @@ games_database = pd.read_csv(config.GAMES_CSV, index_col=0)
 
 # TODO Four programs: discord bot, twitch trend/activity monitor, Server, Client
 
-# TODO Intelligent Video Scraping Process (BASED ON MY YT CHANNELS)
+# TODO Intelligent Video Scraping Process (BASED ON YT CHANNELS)
 
 
-def Start():
-    # GET Database of Channels (What to look for in clips, last time upload, ect)
-    # GET Channel Databases (Maybe The Archive or implement that into the main database)
-    pass
+# def start():
+# GET Database of Channels (What to look for in clips, last time upload, ect)
+# GET Channel Databases (Maybe The Archive or implement that into the main database)
 
 
 def scrape_videos_example():
@@ -45,6 +44,7 @@ def scrape_videos_example():
 
     # No TO DO Automate: Dataframe for each channel? (I WILL PROBABLY MAKE THIS)
     pass
+# scrape_videos_example()
 
 
 def twitch_vid_example():
@@ -66,3 +66,8 @@ def twitch_vid_example():
             print(clip["broadcaster_id"] + "," + clip["broadcaster_name"])
             # caster_database.loc[clip["broadcaster_id"]] = [clip["broadcaster_name"]]
     caster_database.to_csv(config.BROADCASTER_CSV)
+
+
+def scrape_request():
+    # TODO ability to request a scrape of any type for any amount
+    pass
