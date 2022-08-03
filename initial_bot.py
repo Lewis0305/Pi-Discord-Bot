@@ -43,6 +43,14 @@ def add_video(clip_info, rate_info):
     video_database = pd.read_csv(config.VIDEO_CSV, index_col=0)
 
     video_database.loc[clip_info["id"]] = {
+        'rating': rate_info.rating,
+        'clip_use': rate_info.clip_use,
+        'clip_title': rate_info.clip_title,
+        'video_use': rate_info.video_use
+    }
+    video_database.to_csv(config.VIDEO_CSV)
+"""
+    video_database.loc[clip_info["id"]] = {
         'video_title': clip_info["title"],
         'rating': rate_info.rating,
         'clip_use': rate_info.clip_use,
@@ -59,8 +67,8 @@ def add_video(clip_info, rate_info):
         'time_created': clip_info["created_at"],  # might want to alter this (maybe turn into datetime)
         'duration': clip_info["duration"]
     }
+"""
 
-    video_database.to_csv(config.VIDEO_CSV)
 
 
 @bot.command()
@@ -144,6 +152,7 @@ async def rating_loop(ctx):
         else:
             await clip_message.edit(f"*Use as a Clip: **{interaction_clip.component.label}***." +
                                     f" By {interaction_clip.author}")
+            clip_rating.clip_title = "none"
 
         # Main Video #####################################################################################
         video_message = await ctx.send("Use in a **Video**?", components=[
